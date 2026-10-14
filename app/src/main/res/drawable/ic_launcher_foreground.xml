@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Outer White Shield -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M54,24 L30,34 L30,52 C30,69.5 40.2,85.2 54,90 C67.8,85.2 78,69.5 78,52 L78,34 L54,24 Z" />
+
+    <!-- Inner Keyhole Circle -->
+    <path
+        android:fillColor="#0B65C6"
+        android:pathData="M54,46 A6,6 0 1,1 53.99,46 Z" />
+
+    <!-- Inner Keyhole Slot -->
+    <path
+        android:fillColor="#0B65C6"
+        android:pathData="M51,50 L57,50 L58.5,64 L49.5,64 Z" />
+</vector>
