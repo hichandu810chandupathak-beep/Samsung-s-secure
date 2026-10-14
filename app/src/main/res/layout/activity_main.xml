@@ -7,7 +7,7 @@
     </LinearLayout>
     <LinearLayout android:background="@drawable/bg_oneui_card" android:id="@+id/cardPermission" android:layout_height="wrap_content" android:layout_marginBottom="12dp" android:layout_width="match_parent" android:orientation="vertical" android:padding="16dp">
         <TextView android:layout_height="wrap_content" android:layout_width="match_parent" android:text="Accessibility Permission Required" android:textColor="@color/oneui_text_primary" android:textSize="16sp" android:textStyle="bold"/>
-        <TextView android:layout_height="wrap_content" android:layout_marginTop="4dp" android:layout_width="match_parent" android:text="Enable Accessibility service so S Secure can lock apps when opened." android:textColor="@color/oneui_text_secondary" android:textSize="13sp"/>
+        <TextView android:layout_height="wrap_content" android:layout_marginTop="4dp" android:layout_width="match_parent" android:text="Enable Accessibility service so S Secure can instantly lock apps when opened." android:textColor="@color/oneui_text_secondary" android:textSize="13sp"/>
         <Button android:backgroundTint="@color/s_secure_blue" android:id="@+id/btnGrantPermission" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:layout_width="wrap_content" android:text="Enable Accessibility" android:textAllCaps="false" android:textColor="#FFFFFF"/>
     </LinearLayout>
     <LinearLayout android:background="@drawable/bg_oneui_card" android:layout_height="wrap_content" android:layout_marginBottom="12dp" android:layout_width="match_parent" android:orientation="vertical" android:padding="16dp">
@@ -21,7 +21,7 @@
         <Button android:backgroundTint="@color/s_secure_dark_blue" android:id="@+id/btnSetPin" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:layout_width="match_parent" android:text="Set / Change Master PIN" android:textAllCaps="false" android:textColor="#FFFFFF"/>
     </LinearLayout>
     <LinearLayout android:background="@drawable/bg_oneui_card" android:layout_height="0dp" android:layout_weight="1" android:layout_width="match_parent" android:orientation="vertical" android:padding="12dp">
-        <TextView android:layout_height="wrap_content" android:layout_width="match_parent" android:paddingBottom="8dp" android:paddingEnd="8dp" android:paddingStart="8dp" android:text="Tap an app to choose its lock type (PIN, Pattern, Fingerprint, Face, Password)" android:textColor="@color/oneui_text_secondary" android:textSize="13sp" android:textStyle="bold"/>
+        <TextView android:layout_height="wrap_content" android:layout_width="match_parent" android:paddingBottom="8dp" android:paddingEnd="8dp" android:paddingStart="8dp" android:text="Tap any app card to choose lock (PIN, Pattern, Fingerprint, Face, Password)" android:textColor="@color/oneui_text_secondary" android:textSize="13sp" android:textStyle="bold"/>
         <androidx.recyclerview.widget.RecyclerView android:id="@+id/rvApps" android:layout_width="match_parent" android:layout_height="match_parent" android:clipToPadding="false" />
     </LinearLayout>
 </LinearLayout>

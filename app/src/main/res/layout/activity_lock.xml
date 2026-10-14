@@ -1,44 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout android:background="@color/lock_bg_dark" android:gravity="center_horizontal" android:layout_height="match_parent" android:layout_width="match_parent" android:orientation="vertical" android:padding="24dp" xmlns:android="http://schemas.android.com/apk/res/android">
-
     <Space android:layout_height="0dp" android:layout_weight="1" android:layout_width="match_parent"/>
-
     <ImageView android:contentDescription="Locked App" android:id="@+id/ivLockedAppIcon" android:layout_height="72dp" android:layout_width="72dp" android:src="@mipmap/ic_launcher"/>
-
     <TextView android:id="@+id/tvLockedAppName" android:layout_height="wrap_content" android:layout_marginTop="16dp" android:layout_width="wrap_content" android:text="S Secure" android:textColor="#FFFFFF" android:textSize="22sp" android:textStyle="bold"/>
-
-    <TextView android:id="@+id/tvLockSubtitle" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:layout_width="wrap_content" android:text="Enter 4-digit PIN or use Fingerprint" android:textColor="#B0BEC5" android:textSize="14sp"/>
-
-    <TextView android:id="@+id/tvPinDots" android:layout_height="wrap_content" android:layout_marginBottom="28dp" android:layout_marginTop="28dp" android:layout_width="wrap_content" android:letterSpacing="0.2" android:text="○  ○  ○  ○" android:textColor="#00A8E8" android:textSize="28sp"/>
-
-    <!-- PIN Keypad Grid -->
-    <GridLayout android:alignmentMode="alignMargins" android:columnCount="3" android:layout_height="wrap_content" android:layout_width="wrap_content" android:rowCount="4" android:useDefaultMargins="true">
-
-        <Button android:background="@drawable/bg_pin_button" android:id="@+id/btnKey1" android:layout_height="76dp" android:layout_width="76dp" android:text="1" android:textColor="#FFFFFF" android:textSize="24sp"/>
-
-        <Button android:background="@drawable/bg_pin_button" android:id="@+id/btnKey2" android:layout_height="76dp" android:layout_width="76dp" android:text="2" android:textColor="#FFFFFF" android:textSize="24sp"/>
-
-        <Button android:background="@drawable/bg_pin_button" android:id="@+id/btnKey3" android:layout_height="76dp" android:layout_width="76dp" android:text="3" android:textColor="#FFFFFF" android:textSize="24sp"/>
-
-        <Button android:background="@drawable/bg_pin_button" android:id="@+id/btnKey4" android:layout_height="76dp" android:layout_width="76dp" android:text="4" android:textColor="#FFFFFF" android:textSize="24sp"/>
-
-        <Button android:background="@drawable/bg_pin_button" android:id="@+id/btnKey5" android:layout_height="76dp" android:layout_width="76dp" android:text="5" android:textColor="#FFFFFF" android:textSize="24sp"/>
-
-        <Button android:background="@drawable/bg_pin_button" android:id="@+id/btnKey6" android:layout_height="76dp" android:layout_width="76dp" android:text="6" android:textColor="#FFFFFF" android:textSize="24sp"/>
-
-        <Button android:background="@drawable/bg_pin_button" android:id="@+id/btnKey7" android:layout_height="76dp" android:layout_width="76dp" android:text="7" android:textColor="#FFFFFF" android:textSize="24sp"/>
-
-        <Button android:background="@drawable/bg_pin_button" android:id="@+id/btnKey8" android:layout_height="76dp" android:layout_width="76dp" android:text="8" android:textColor="#FFFFFF" android:textSize="24sp"/>
-
-        <Button android:background="@drawable/bg_pin_button" android:id="@+id/btnKey9" android:layout_height="76dp" android:layout_width="76dp" android:text="9" android:textColor="#FFFFFF" android:textSize="24sp"/>
-
-        <Button android:background="@drawable/bg_pin_button" android:id="@+id/btnKeyBiometric" android:layout_height="76dp" android:layout_width="76dp" android:text="FP" android:textColor="#00A8E8" android:textSize="16sp" android:textStyle="bold"/>
-
-        <Button android:background="@drawable/bg_pin_button" android:id="@+id/btnKey0" android:layout_height="76dp" android:layout_width="76dp" android:text="0" android:textColor="#FFFFFF" android:textSize="24sp"/>
-
-        <Button android:background="@drawable/bg_pin_button" android:id="@+id/btnKeyBackspace" android:layout_height="76dp" android:layout_width="76dp" android:text="⌫" android:textColor="#FFFFFF" android:textSize="22sp"/>
+    <TextView android:id="@+id/tvLockSubtitle" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:layout_width="wrap_content" android:text="Enter Security Code" android:textColor="#B0BEC5" android:textSize="14sp"/>
+    <TextView android:id="@+id/tvPinDots" android:layout_height="wrap_content" android:layout_marginBottom="24dp" android:layout_marginTop="24dp" android:layout_width="wrap_content" android:letterSpacing="0.2" android:text="○  ○  ○  ○" android:textColor="#00A8E8" android:textSize="28sp"/>
+    <GridLayout android:id="@+id/keypadLayout" android:alignmentMode="alignMargins" android:columnCount="3" android:layout_height="wrap_content" android:layout_width="wrap_content" android:rowCount="4" android:useDefaultMargins="true">
+        <Button android:background="@drawable/bg_pin_button" android:id="@+id/btnKey1" android:layout_height="70dp" android:layout_width="70dp" android:text="1" android:textColor="#FFFFFF" android:textSize="22sp"/>
+        <Button android:background="@drawable/bg_pin_button" android:id="@+id/btnKey2" android:layout_height="70dp" android:layout_width="70dp" android:text="2" android:textColor="#FFFFFF" android:textSize="22sp"/>
+        <Button android:background="@drawable/bg_pin_button" android:id="@+id/btnKey3" android:layout_height="70dp" android:layout_width="70dp" android:text="3" android:textColor="#FFFFFF" android:textSize="22sp"/>
+        <Button android:background="@drawable/bg_pin_button" android:id="@+id/btnKey4" android:layout_height="70dp" android:layout_width="70dp" android:text="4" android:textColor="#FFFFFF" android:textSize="22sp"/>
+        <Button android:background="@drawable/bg_pin_button" android:id="@+id/btnKey5" android:layout_height="70dp" android:layout_width="70dp" android:text="5" android:textColor="#FFFFFF" android:textSize="22sp"/>
+        <Button android:background="@drawable/bg_pin_button" android:id="@+id/btnKey6" android:layout_height="70dp" android:layout_width="70dp" android:text="6" android:textColor="#FFFFFF" android:textSize="22sp"/>
+        <Button android:background="@drawable/bg_pin_button" android:id="@+id/btnKey7" android:layout_height="70dp" android:layout_width="70dp" android:text="7" android:textColor="#FFFFFF" android:textSize="22sp"/>
+        <Button android:background="@drawable/bg_pin_button" android:id="@+id/btnKey8" android:layout_height="70dp" android:layout_width="70dp" android:text="8" android:textColor="#FFFFFF" android:textSize="22sp"/>
+        <Button android:background="@drawable/bg_pin_button" android:id="@+id/btnKey9" android:layout_height="70dp" android:layout_width="70dp" android:text="9" android:textColor="#FFFFFF" android:textSize="22sp"/>
+        <Button android:background="@drawable/bg_pin_button" android:id="@+id/btnKeyBiometric" android:layout_height="70dp" android:layout_width="70dp" android:text="BIO" android:textColor="#00A8E8" android:textSize="14sp" android:textStyle="bold"/>
+        <Button android:background="@drawable/bg_pin_button" android:id="@+id/btnKey0" android:layout_height="70dp" android:layout_width="70dp" android:text="0" android:textColor="#FFFFFF" android:textSize="22sp"/>
+        <Button android:background="@drawable/bg_pin_button" android:id="@+id/btnKeyBackspace" android:layout_height="70dp" android:layout_width="70dp" android:text="⌫" android:textColor="#FFFFFF" android:textSize="20sp"/>
     </GridLayout>
-
     <Space android:layout_height="0dp" android:layout_weight="1" android:layout_width="match_parent"/>
-
 </LinearLayout>

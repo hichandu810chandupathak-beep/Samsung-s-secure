@@ -14,13 +14,13 @@ data class AppItem(
     val packageName: String,
     val icon: Drawable,
     var isLocked: Boolean,
-    var lockType: String = "PIN"
+    var lockType: String
 )
 
 class AppListAdapter(
     private val apps: List<AppItem>,
     private val onLockChanged: (String, Boolean) -> Unit,
-    private val onAppItemClicked: (AppItem) -> Unit = {}
+    private val onAppItemClicked: (AppItem) -> Unit
 ) : RecyclerView.Adapter<AppListAdapter.AppViewHolder>() {
 
     class AppViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -41,16 +41,26 @@ class AppListAdapter(
         holder.ivAppIcon.setImageDrawable(item.icon)
         holder.tvAppName.text = item.appName
         holder.tvPackageName.text = item.packageName
-        holder.tvLockTypeBadge.visibility = if (item.isLocked) View.VISIBLE else View.GONE
-        holder.tvLockTypeBadge.text = item.lockType
+        
+        if (item.isLocked) {
+            holder.tvLockTypeBadge.visibility = View.VISIBLE
+            holder.tvLockTypeBadge.text = item.lockType
+        } else {
+            holder.tvLockTypeBadge.visibility = View.GONE
+        }
+
         holder.switchAppLock.setOnCheckedChangeListener(null)
         holder.switchAppLock.isChecked = item.isLocked
-        holder.switchAppLock.setOnCheckedChangeListener { _, checked ->
-            item.isLocked = checked
-            holder.tvLockTypeBadge.visibility = if (checked) View.VISIBLE else View.GONE
-            onLockChanged(item.packageName, checked)
+
+        holder.switchAppLock.setOnCheckedChangeListener { _, isChecked ->
+            item.isLocked = isChecked
+            holder.tvLockTypeBadge.visibility = if (isChecked) View.VISIBLE else View.GONE
+            onLockChanged(item.packageName, isChecked)
         }
-        holder.itemView.setOnClickListener { onAppItemClicked(item) }
+
+        holder.itemView.setOnClickListener {
+            onAppItemClicked(item)
+        }
     }
 
     override fun getItemCount(): Int = apps.size
