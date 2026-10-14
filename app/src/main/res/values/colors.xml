@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="s_secure_blue">#0B65C6</color>
+    <color name="s_secure_dark_blue">#084B94</color>
+    <color name="s_secure_accent">#00A8E8</color>
+    <color name="oneui_bg">#F2F2F7</color>
+    <color name="oneui_card_bg">#FFFFFF</color>
+    <color name="oneui_text_primary">#1C1C1E</color>
+    <color name="oneui_text_secondary">#6C6C70</color>
+    <color name="lock_bg_dark">#0D1B2A</color>
+</resources>
