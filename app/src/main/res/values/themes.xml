@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.SSecure" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="colorPrimary">@color/s_secure_blue</item>
+        <item name="colorPrimaryVariant">@color/s_secure_dark_blue</item>
+        <item name="colorAccent">@color/s_secure_accent</item>
+        <item name="android:statusBarColor">@color/oneui_bg</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowBackground">@color/oneui_bg</item>
+    </style>
+
+    <style name="Theme.SSecure.LockScreen" parent="Theme.MaterialComponents.NoActionBar">
+        <item name="colorPrimary">@color/s_secure_blue</item>
+        <item name="android:statusBarColor">@color/lock_bg_dark</item>
+        <item name="android:navigationBarColor">@color/lock_bg_dark</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowBackground">@color/lock_bg_dark</item>
+    </style>
+</resources>
