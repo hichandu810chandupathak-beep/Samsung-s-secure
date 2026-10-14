@@ -1,18 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout android:gravity="center_vertical" android:layout_height="wrap_content" android:layout_width="match_parent" android:orientation="horizontal" android:paddingBottom="10dp" android:paddingEnd="8dp" android:paddingStart="8dp" android:paddingTop="10dp" xmlns:android="http://schemas.android.com/apk/res/android">
-
     <ImageView android:contentDescription="App Icon" android:id="@+id/ivAppIcon" android:layout_height="44dp" android:layout_width="44dp"/>
-
     <LinearLayout android:layout_height="wrap_content" android:layout_marginEnd="8dp" android:layout_marginStart="14dp" android:layout_weight="1" android:layout_width="0dp" android:orientation="vertical">
-
         <TextView android:ellipsize="end" android:id="@+id/tvAppName" android:layout_height="wrap_content" android:layout_width="match_parent" android:maxLines="1" android:text="App Name" android:textColor="@color/oneui_text_primary" android:textSize="16sp" android:textStyle="bold"/>
-
-        <TextView android:ellipsize="end" android:id="@+id/tvPackageName" android:layout_height="wrap_content" android:layout_width="match_parent" android:maxLines="1" android:text="com.example.app" android:textColor="@color/oneui_text_secondary" android:textSize="12sp"/>
+        <LinearLayout android:gravity="center_vertical" android:layout_height="wrap_content" android:layout_marginTop="2dp" android:layout_width="match_parent" android:orientation="horizontal">
+            <TextView android:ellipsize="end" android:id="@+id/tvPackageName" android:layout_height="wrap_content" android:layout_weight="1" android:layout_width="0dp" android:maxLines="1" android:text="com.example.app" android:textColor="@color/oneui_text_secondary" android:textSize="12sp"/>
+            <TextView android:background="@drawable/bg_pin_button" android:id="@+id/tvLockTypeBadge" android:layout_height="wrap_content" android:layout_width="wrap_content" android:paddingBottom="2dp" android:paddingEnd="6dp" android:paddingStart="6dp" android:paddingTop="2dp" android:text="PIN" android:textColor="#FFFFFF" android:textSize="11sp" android:textStyle="bold" android:visibility="gone"/>
+        </LinearLayout>
     </LinearLayout>
-
-    <androidx.appcompat.widget.SwitchCompat
-        android:id="@+id/switchAppLock"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-
+    <androidx.appcompat.widget.SwitchCompat android:id="@+id/switchAppLock" android:layout_width="wrap_content" android:layout_height="wrap_content" />
 </LinearLayout>

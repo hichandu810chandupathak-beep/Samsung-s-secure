@@ -1,57 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout android:background="@color/oneui_bg" android:layout_height="match_parent" android:layout_width="match_parent" android:orientation="vertical" android:padding="16dp" xmlns:android="http://schemas.android.com/apk/res/android">
-
-    <!-- Samsung One UI Style Top Header -->
     <LinearLayout android:gravity="center_horizontal" android:layout_height="wrap_content" android:layout_width="match_parent" android:orientation="vertical" android:paddingBottom="20dp" android:paddingTop="24dp">
-
         <ImageView android:contentDescription="@string/app_name" android:layout_height="56dp" android:layout_width="56dp" android:src="@mipmap/ic_launcher"/>
-
         <TextView android:layout_height="wrap_content" android:layout_marginTop="10dp" android:layout_width="wrap_content" android:text="S Secure App Lock" android:textColor="@color/oneui_text_primary" android:textSize="26sp" android:textStyle="bold"/>
-
         <TextView android:id="@+id/tvLockedCount" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:layout_width="wrap_content" android:text="0 apps locked" android:textColor="@color/oneui_text_secondary" android:textSize="14sp"/>
     </LinearLayout>
-
-    <!-- Permission Setup Banner (Hidden once granted) -->
     <LinearLayout android:background="@drawable/bg_oneui_card" android:id="@+id/cardPermission" android:layout_height="wrap_content" android:layout_marginBottom="12dp" android:layout_width="match_parent" android:orientation="vertical" android:padding="16dp">
-
-        <TextView android:layout_height="wrap_content" android:layout_width="match_parent" android:text="Usage Access Required" android:textColor="@color/oneui_text_primary" android:textSize="16sp" android:textStyle="bold"/>
-
-        <TextView android:layout_height="wrap_content" android:layout_marginTop="4dp" android:layout_width="match_parent" android:text="Allow Usage Access so S Secure can detect when a locked app is opened." android:textColor="@color/oneui_text_secondary" android:textSize="13sp"/>
-
-        <Button android:backgroundTint="@color/s_secure_blue" android:id="@+id/btnGrantPermission" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:layout_width="wrap_content" android:text="Grant Usage Access" android:textAllCaps="false" android:textColor="#FFFFFF"/>
+        <TextView android:layout_height="wrap_content" android:layout_width="match_parent" android:text="Accessibility Permission Required" android:textColor="@color/oneui_text_primary" android:textSize="16sp" android:textStyle="bold"/>
+        <TextView android:layout_height="wrap_content" android:layout_marginTop="4dp" android:layout_width="match_parent" android:text="Enable Accessibility service so S Secure can lock apps when opened." android:textColor="@color/oneui_text_secondary" android:textSize="13sp"/>
+        <Button android:backgroundTint="@color/s_secure_blue" android:id="@+id/btnGrantPermission" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:layout_width="wrap_content" android:text="Enable Accessibility" android:textAllCaps="false" android:textColor="#FFFFFF"/>
     </LinearLayout>
-
-    <!-- Master Switch & PIN Controls Card -->
     <LinearLayout android:background="@drawable/bg_oneui_card" android:layout_height="wrap_content" android:layout_marginBottom="12dp" android:layout_width="match_parent" android:orientation="vertical" android:padding="16dp">
-
         <LinearLayout android:gravity="center_vertical" android:layout_height="wrap_content" android:layout_width="match_parent" android:orientation="horizontal">
-
             <LinearLayout android:layout_height="wrap_content" android:layout_weight="1" android:layout_width="0dp" android:orientation="vertical">
-
-                <TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:text="App Lock Service" android:textColor="@color/oneui_text_primary" android:textSize="17sp" android:textStyle="bold"/>
-
-                <TextView android:id="@+id/tvServiceStatus" android:layout_height="wrap_content" android:layout_width="wrap_content" android:text="Protection is ON" android:textColor="@color/s_secure_blue" android:textSize="13sp"/>
+                <TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:text="App Lock Protection" android:textColor="@color/oneui_text_primary" android:textSize="17sp" android:textStyle="bold"/>
+                <TextView android:id="@+id/tvServiceStatus" android:layout_height="wrap_content" android:layout_width="wrap_content" android:text="Protection is Active" android:textColor="@color/s_secure_blue" android:textSize="13sp"/>
             </LinearLayout>
-
-            <androidx.appcompat.widget.SwitchCompat
-                android:id="@+id/switchMaster"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+            <androidx.appcompat.widget.SwitchCompat android:id="@+id/switchMaster" android:layout_width="wrap_content" android:layout_height="wrap_content" />
         </LinearLayout>
-
-        <Button android:backgroundTint="@color/s_secure_dark_blue" android:id="@+id/btnSetPin" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:layout_width="match_parent" android:text="Set / Change 4-Digit PIN" android:textAllCaps="false" android:textColor="#FFFFFF"/>
+        <Button android:backgroundTint="@color/s_secure_dark_blue" android:id="@+id/btnSetPin" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:layout_width="match_parent" android:text="Set / Change Master PIN" android:textAllCaps="false" android:textColor="#FFFFFF"/>
     </LinearLayout>
-
-    <!-- Installed Apps List Card -->
     <LinearLayout android:background="@drawable/bg_oneui_card" android:layout_height="0dp" android:layout_weight="1" android:layout_width="match_parent" android:orientation="vertical" android:padding="12dp">
-
-        <TextView android:layout_height="wrap_content" android:layout_width="match_parent" android:paddingBottom="8dp" android:paddingEnd="8dp" android:paddingStart="8dp" android:text="Select Apps to Lock" android:textColor="@color/oneui_text_secondary" android:textSize="14sp" android:textStyle="bold"/>
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvApps"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:clipToPadding="false" />
+        <TextView android:layout_height="wrap_content" android:layout_width="match_parent" android:paddingBottom="8dp" android:paddingEnd="8dp" android:paddingStart="8dp" android:text="Tap an app to choose its lock type (PIN, Pattern, Fingerprint, Face, Password)" android:textColor="@color/oneui_text_secondary" android:textSize="13sp" android:textStyle="bold"/>
+        <androidx.recyclerview.widget.RecyclerView android:id="@+id/rvApps" android:layout_width="match_parent" android:layout_height="match_parent" android:clipToPadding="false" />
     </LinearLayout>
-
 </LinearLayout>

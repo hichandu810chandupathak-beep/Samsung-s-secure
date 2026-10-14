@@ -1,27 +1,21 @@
 package com.ssecure.applock
 
-import android.Manifest
-import android.app.AppOpsManager
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.os.Build
 import android.os.Bundle
-import android.os.Process
 import android.provider.Settings
 import android.view.View
+import android.view.accessibility.AccessibilityManager
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SwitchCompat
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
 class MainActivity : AppCompatActivity() {
-
     private lateinit var prefManager: PrefManager
     private lateinit var tvLockedCount: TextView
     private lateinit var cardPermission: LinearLayout
@@ -32,40 +26,30 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
         prefManager = PrefManager(this)
         tvLockedCount = findViewById(R.id.tvLockedCount)
         cardPermission = findViewById(R.id.cardPermission)
         tvServiceStatus = findViewById(R.id.tvServiceStatus)
         switchMaster = findViewById(R.id.switchMaster)
         rvApps = findViewById(R.id.rvApps)
-
         rvApps.layoutManager = LinearLayoutManager(this)
 
         findViewById<Button>(R.id.btnGrantPermission).setOnClickListener {
-            startActivity(Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS))
+            try { startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)) }
+            catch (_: Exception) { startActivity(Intent(Settings.ACTION_SETTINGS)) }
         }
-
         findViewById<Button>(R.id.btnSetPin).setOnClickListener {
-            val intent = Intent(this, LockActivity::class.java).apply {
+            startActivity(Intent(this, LockActivity::class.java).apply {
                 putExtra(LockActivity.EXTRA_MODE, LockActivity.MODE_SET_PIN)
-            }
-            startActivity(intent)
+            })
         }
-
         setupMasterSwitch()
-        requestNotificationPermissionIfNeeded()
         loadInstalledApps()
     }
 
     override fun onResume() {
         super.onResume()
-        val hasUsageAccess = hasUsageStatsPermission()
-        cardPermission.visibility = if (hasUsageAccess) View.GONE else View.VISIBLE
-
-        if (hasUsageAccess && prefManager.isServiceEnabled()) {
-            startProtectionService()
-        }
+        cardPermission.visibility = if (isAccessibilityServiceEnabled()) View.GONE else View.VISIBLE
         updateLockedCountText()
     }
 
@@ -73,99 +57,83 @@ class MainActivity : AppCompatActivity() {
         val enabled = prefManager.isServiceEnabled()
         switchMaster.isChecked = enabled
         updateServiceStatusUI(enabled)
-
-        switchMaster.setOnCheckedChangeListener { _, isChecked ->
-            prefManager.setServiceEnabled(isChecked)
-            updateServiceStatusUI(isChecked)
-            if (isChecked && hasUsageStatsPermission()) {
-                startProtectionService()
-            } else {
-                stopService(Intent(this, AppLockService::class.java))
-            }
+        switchMaster.setOnCheckedChangeListener { _, checked ->
+            prefManager.setServiceEnabled(checked)
+            updateServiceStatusUI(checked)
         }
     }
 
     private fun updateServiceStatusUI(enabled: Boolean) {
-        tvServiceStatus.text = if (enabled) "Protection is ON" else "Protection is OFF"
-    }
-
-    private fun startProtectionService() {
-        val serviceIntent = Intent(this, AppLockService::class.java)
-        ContextCompat.startForegroundService(this, serviceIntent)
+        tvServiceStatus.text = if (enabled) "Protection is Active" else "Protection is Paused"
     }
 
     private fun loadInstalledApps() {
-        val mainIntent = Intent(Intent.ACTION_MAIN, null).apply {
-            addCategory(Intent.CATEGORY_LAUNCHER)
+        val launcherIntent = Intent(Intent.ACTION_MAIN, null).apply { addCategory(Intent.CATEGORY_LAUNCHER) }
+        val resolved = packageManager.queryIntentActivities(launcherIntent, 0)
+        val locked = prefManager.getLockedPackages()
+        val items = mutableListOf<AppItem>()
+        val seen = mutableSetOf<String>()
+        for (info in resolved) {
+            val pkg = info.activityInfo.packageName
+            if (pkg == packageName || !seen.add(pkg)) continue
+            items.add(AppItem(
+                appName = info.loadLabel(packageManager).toString(),
+                packageName = pkg,
+                icon = info.loadIcon(packageManager),
+                isLocked = locked.contains(pkg),
+                lockType = prefManager.getAppLockType(pkg)
+            ))
         }
-
-        val resolveInfos = packageManager.queryIntentActivities(mainIntent, 0)
-        val lockedSet = prefManager.getLockedPackages()
-        val appItems = mutableListOf<AppItem>()
-        val seenPackages = mutableSetOf<String>()
-
-        for (info in resolveInfos) {
-            val pkgName = info.activityInfo.packageName
-            if (pkgName == packageName || !seenPackages.add(pkgName)) continue
-
-            val label = info.loadLabel(packageManager).toString()
-            val icon = info.loadIcon(packageManager)
-            appItems.add(
-                AppItem(
-                    appName = label,
-                    packageName = pkgName,
-                    icon = icon,
-                    isLocked = lockedSet.contains(pkgName)
-                )
-            )
-        }
-
-        appItems.sortBy { it.appName.lowercase() }
-
-        rvApps.adapter = AppListAdapter(appItems) { pkg, isLocked ->
-            prefManager.setAppLocked(pkg, isLocked)
-            updateLockedCountText()
-        }
+        items.sortBy { it.appName.lowercase() }
+        rvApps.adapter = AppListAdapter(
+            items,
+            onLockChanged = { pkg, checked ->
+                prefManager.setAppLocked(pkg, checked)
+                updateLockedCountText()
+            },
+            onAppItemClicked = { item -> showLockOptionsDialog(item) }
+        )
         updateLockedCountText()
     }
 
-    private fun updateLockedCountText() {
-        val count = prefManager.getLockedPackages().size
-        tvLockedCount.text = "$count apps locked"
-    }
-
-    private fun hasUsageStatsPermission(): Boolean {
-        val appOps = getSystemService(Context.APP_OPS_SERVICE) as AppOpsManager
-        val mode = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            appOps.unsafeCheckOpNoThrow(
-                AppOpsManager.OPSTR_GET_USAGE_STATS,
-                Process.myUid(),
-                packageName
-            )
-        } else {
-            @Suppress("DEPRECATION")
-            appOps.checkOpNoThrow(
-                AppOpsManager.OPSTR_GET_USAGE_STATS,
-                Process.myUid(),
-                packageName
-            )
+    private fun showLockOptionsDialog(item: AppItem) {
+        val choices = arrayOf("PIN Lock", "Pattern Lock", "Fingerprint Lock", "Face Lock", "Password")
+        val checked = when (prefManager.getAppLockType(item.packageName)) {
+            "Pattern" -> 1
+            "Fingerprint" -> 2
+            "Face" -> 3
+            "Password" -> 4
+            else -> 0
         }
-        return mode == AppOpsManager.MODE_ALLOWED
-    }
-
-    private fun requestNotificationPermissionIfNeeded() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.POST_NOTIFICATIONS
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                ActivityCompat.requestPermissions(
-                    this,
-                    arrayOf(Manifest.permission.POST_NOTIFICATIONS),
-                    101
-                )
+        AlertDialog.Builder(this)
+            .setTitle("Security for ${item.appName}")
+            .setSingleChoiceItems(choices, checked) { dialog, which ->
+                val type = when (which) {
+                    1 -> "Pattern"
+                    2 -> "Fingerprint"
+                    3 -> "Face"
+                    4 -> "Password"
+                    else -> "PIN"
+                }
+                prefManager.setAppLockType(item.packageName, type)
+                prefManager.setAppLocked(item.packageName, true)
+                loadInstalledApps()
+                dialog.dismiss()
             }
-        }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    private fun updateLockedCountText() {
+        tvLockedCount.text = "${prefManager.getLockedPackages().size} apps locked"
+    }
+
+    private fun isAccessibilityServiceEnabled(): Boolean {
+        val manager = getSystemService(Context.ACCESSIBILITY_SERVICE) as AccessibilityManager
+        val enabled = Settings.Secure.getString(
+            contentResolver, Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
+        ) ?: return false
+        val expected = "$packageName/${AppLockAccessibilityService::class.java.name}"
+        return manager.isEnabled && enabled.split(':').any { it.equals(expected, ignoreCase = true) }
     }
 }
