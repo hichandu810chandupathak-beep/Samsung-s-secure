@@ -24,7 +24,7 @@ class LockActivity : AppCompatActivity() {
     private lateinit var btnKeyBiometric: Button
     private lateinit var keypadLayout: GridLayout
 
-    private var enteredPin = StringBuilder()
+    private val enteredPin = StringBuilder()
     private var mode: String = MODE_LOCK
     private var targetPackage: String = ""
     private var appLockType: String = "PIN"
@@ -42,8 +42,7 @@ class LockActivity : AppCompatActivity() {
         keypadLayout = findViewById(R.id.keypadLayout)
 
         mode = intent.getStringExtra(EXTRA_MODE) ?: MODE_LOCK
-        targetPackage = intent.getStringExtra(EXTRA_PACKAGE_NAME) ?: ""
-
+        targetPackage = intent.getStringExtra(EXTRA_PACKAGE_NAME).orEmpty()
         if (targetPackage.isNotEmpty()) {
             appLockType = prefManager.getAppLockType(targetPackage)
         }
@@ -51,36 +50,43 @@ class LockActivity : AppCompatActivity() {
         setupModeUI()
         setupKeypad()
         setupBackNavigation()
+        updatePinDots()
 
-        if (mode == MODE_LOCK) {
-            if (appLockType == "Fingerprint" || appLockType == "Face") {
-                triggerBiometricPrompt()
-            }
+        if (mode == MODE_LOCK && (appLockType == "Fingerprint" || appLockType == "Face")) {
+            btnKeyBiometric.post { triggerBiometricPrompt() }
         }
     }
 
     private fun setupModeUI() {
         if (mode == MODE_SET_PIN) {
-            tvLockedAppName.text = "Set Master PIN / Password"
-            tvLockSubtitle.text = "Enter your master 4-digit PIN"
-            btnKeyBiometric.visibility = View.INVISIBLE
+            tvLockedAppName.text = "Set Master PIN"
+            tvLockSubtitle.text = "Enter your new 4-digit PIN"
+            btnKeyBiometric.visibility = View.GONE
             keypadLayout.visibility = View.VISIBLE
-        } else {
-            tvLockSubtitle.text = "Unlock with $appLockType"
-            if (appLockType == "Fingerprint" || appLockType == "Face") {
-                btnKeyBiometric.visibility = View.VISIBLE
-            } else {
-                btnKeyBiometric.visibility = View.INVISIBLE
-            }
+            return
+        }
 
-            if (targetPackage.isNotEmpty()) {
-                try {
-                    val appInfo = packageManager.getApplicationInfo(targetPackage, 0)
-                    tvLockedAppName.text = packageManager.getApplicationLabel(appInfo)
-                    ivLockedAppIcon.setImageDrawable(packageManager.getApplicationIcon(appInfo))
-                } catch (_: Exception) {
-                    tvLockedAppName.text = getString(R.string.app_name)
-                }
+        tvLockSubtitle.text = when (appLockType) {
+            "Fingerprint" -> "Verify with fingerprint or use your master PIN"
+            "Face" -> "Verify with device biometrics or use your master PIN"
+            "Password" -> "Enter your 4-digit master PIN"
+            "Pattern" -> "Pattern entry is unavailable; use your master PIN"
+            else -> "Enter your 4-digit master PIN"
+        }
+
+        // Keep the keypad visible as a fallback for every selected lock type.
+        keypadLayout.visibility = View.VISIBLE
+        btnKeyBiometric.visibility =
+            if (appLockType == "Fingerprint" || appLockType == "Face") View.VISIBLE else View.GONE
+
+        if (targetPackage.isNotEmpty()) {
+            try {
+                val appInfo = packageManager.getApplicationInfo(targetPackage, 0)
+                tvLockedAppName.text = packageManager.getApplicationLabel(appInfo)
+                ivLockedAppIcon.setImageDrawable(packageManager.getApplicationIcon(appInfo))
+            } catch (_: Exception) {
+                tvLockedAppName.text = getString(R.string.app_name)
+                ivLockedAppIcon.setImageResource(R.mipmap.ic_launcher)
             }
         }
     }
@@ -103,27 +109,20 @@ class LockActivity : AppCompatActivity() {
                 updatePinDots()
             }
         }
-
-        btnKeyBiometric.setOnClickListener {
-            triggerBiometricPrompt()
-        }
+        btnKeyBiometric.setOnClickListener { triggerBiometricPrompt() }
     }
 
     private fun onDigitPressed(digit: String) {
-        if (enteredPin.length < 4) {
-            enteredPin.append(digit)
-            updatePinDots()
-            if (enteredPin.length == 4) {
-                handleCompletePin(enteredPin.toString())
-            }
-        }
+        if (enteredPin.length >= 4) return
+        enteredPin.append(digit)
+        updatePinDots()
+        if (enteredPin.length == 4) handleCompletePin(enteredPin.toString())
     }
 
     private fun updatePinDots() {
-        val dots = (1..4).joinToString("  ") { index ->
+        tvPinDots.text = (1..4).joinToString("  ") { index ->
             if (index <= enteredPin.length) "●" else "○"
         }
-        tvPinDots.text = dots
     }
 
     private fun handleCompletePin(pin: String) {
@@ -131,50 +130,76 @@ class LockActivity : AppCompatActivity() {
             prefManager.setPin(pin)
             Toast.makeText(this, "Master PIN updated successfully", Toast.LENGTH_SHORT).show()
             finish()
+            return
+        }
+
+        if (pin == prefManager.getPin()) {
+            onUnlockSuccess()
         } else {
-            if (pin == prefManager.getPin()) {
-                onUnlockSuccess()
-            } else {
-                enteredPin.clear()
-                updatePinDots()
-                tvLockSubtitle.text = "Incorrect PIN. Try again."
-            }
+            enteredPin.clear()
+            updatePinDots()
+            tvLockSubtitle.text = "Incorrect PIN. Try again."
         }
     }
 
     private fun triggerBiometricPrompt() {
-        val biometricManager = BiometricManager.from(this)
-        val canAuth = biometricManager.canAuthenticate(
-            BiometricManager.Authenticators.BIOMETRIC_WEAK or BiometricManager.Authenticators.BIOMETRIC_STRONG
-        )
+        if (isFinishing || isDestroyed) return
+
+        val authenticators = BiometricManager.Authenticators.BIOMETRIC_WEAK
+        val canAuth = BiometricManager.from(this).canAuthenticate(authenticators)
         if (canAuth != BiometricManager.BIOMETRIC_SUCCESS) {
-            Toast.makeText(this, "Biometric/Face/Fingerprint not configured on device. Use PIN.", Toast.LENGTH_SHORT).show()
+            tvLockSubtitle.text = "Biometric unavailable. Enter your master PIN."
             return
         }
 
         val executor = ContextCompat.getMainExecutor(this)
-        val biometricPrompt = BiometricPrompt(
-            this, executor,
+        val prompt = BiometricPrompt(
+            this,
+            executor,
             object : BiometricPrompt.AuthenticationCallback() {
                 override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
                     super.onAuthenticationSucceeded(result)
                     onUnlockSuccess()
                 }
+
+                override fun onAuthenticationFailed() {
+                    super.onAuthenticationFailed()
+                    tvLockSubtitle.text = "Not recognized. Try again or use your master PIN."
+                }
+
+                override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
+                    super.onAuthenticationError(errorCode, errString)
+                    tvLockSubtitle.text = if (
+                        errorCode == BiometricPrompt.ERROR_NEGATIVE_BUTTON ||
+                        errorCode == BiometricPrompt.ERROR_USER_CANCELED ||
+                        errorCode == BiometricPrompt.ERROR_CANCELED
+                    ) {
+                        "Enter your master PIN to unlock."
+                    } else {
+                        "Biometric unavailable. Enter your master PIN."
+                    }
+                }
             }
         )
 
-        val promptTitle = if (appLockType == "Face") "Face Unlock" else "Fingerprint Unlock"
+        val title = if (appLockType == "Face") {
+            "S Secure - Face / Biometric Unlock"
+        } else {
+            "S Secure - Fingerprint Unlock"
+        }
         val promptInfo = BiometricPrompt.PromptInfo.Builder()
-            .setTitle("S Secure - $promptTitle")
+            .setTitle(title)
             .setSubtitle("Verify to unlock ${tvLockedAppName.text}")
+            .setAllowedAuthenticators(authenticators)
             .setNegativeButtonText("Use PIN")
             .build()
 
-        biometricPrompt.authenticate(promptInfo)
+        prompt.authenticate(promptInfo)
     }
 
     private fun onUnlockSuccess() {
         if (targetPackage.isNotEmpty()) {
+            prefManager.addUnlockedApp(targetPackage)
             prefManager.setLastUnlockedPkg(targetPackage)
         }
         finish()

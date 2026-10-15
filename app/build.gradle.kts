@@ -11,8 +11,8 @@ android {
         applicationId = "com.ssecure.applock"
         minSdk = 26
         targetSdk = 34
-        versionCode = 3
-        versionName = "3.0.0"
+        versionCode = 6
+        versionName = "6.0.0"
     }
 
     buildTypes {
