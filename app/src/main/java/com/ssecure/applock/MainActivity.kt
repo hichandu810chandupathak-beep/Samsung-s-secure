@@ -107,6 +107,24 @@ class MainActivity : AppCompatActivity() {
             )
         }
 
+        // Add S Secure itself as a lockable item; launcher query excludes this package above.
+        if (seenPackages.add(packageName)) {
+            try {
+                val ownInfo = packageManager.getApplicationInfo(packageName, 0)
+                appItems.add(
+                    AppItem(
+                        appName = packageManager.getApplicationLabel(ownInfo).toString(),
+                        packageName = packageName,
+                        icon = packageManager.getApplicationIcon(ownInfo),
+                        isLocked = lockedSet.contains(packageName),
+                        lockType = prefManager.getAppLockType(packageName)
+                    )
+                )
+            } catch (_: Exception) {
+                // Keep the installed-app list available if own app label/icon lookup fails.
+            }
+        }
+
         appItems.sortBy { it.appName.lowercase() }
 
         rvApps.adapter = AppListAdapter(

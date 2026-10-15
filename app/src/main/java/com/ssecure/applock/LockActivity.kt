@@ -41,11 +41,14 @@ class LockActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Fully opaque lock window blocks the protected app/dashboard behind it.
         window.setBackgroundDrawableResource(R.color.lock_bg_dark)
         window.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
         window.setDimAmount(0f)
+        window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
         setContentView(R.layout.activity_lock)
         window.setBackgroundDrawableResource(R.color.lock_bg_dark)
+        window.decorView.setBackgroundColor(ContextCompat.getColor(this, R.color.lock_bg_dark))
         pm = PrefManager(this)
         dots = findViewById(R.id.tvPinDots); appName = findViewById(R.id.tvLockedAppName)
         subtitle = findViewById(R.id.tvLockSubtitle); appIcon = findViewById(R.id.ivLockedAppIcon)
@@ -199,9 +202,14 @@ class LockActivity : AppCompatActivity() {
             override fun onAuthenticationFailed() { super.onAuthenticationFailed(); subtitle.text = "Not recognized. Try again." }
             override fun onAuthenticationError(errorCode: Int, errString: CharSequence) { super.onAuthenticationError(errorCode, errString); subtitle.text = "Use device biometrics or master PIN." }
         })
-        val title = if (type == "Face") "S Secure - Device Biometric" else "S Secure - Fingerprint"
+        val title = if (type == "Face") "S Secure - Face / Device Biometric" else "S Secure - Fingerprint"
+        val promptSubtitle = if (type == "Face") {
+            "Use an enrolled device biometric. Android selects the available modality."
+        } else {
+            "Verify to unlock ${appName.text}"
+        }
         prompt.authenticate(BiometricPrompt.PromptInfo.Builder().setTitle(title)
-            .setSubtitle("Verify to unlock ${appName.text}").setAllowedAuthenticators(auth)
+            .setSubtitle(promptSubtitle).setAllowedAuthenticators(auth)
             .setNegativeButtonText("Use PIN").build())
     }
 
