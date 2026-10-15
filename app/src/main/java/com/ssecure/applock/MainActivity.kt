@@ -1,5 +1,7 @@
 package com.ssecure.applock
 
+import android.app.admin.DevicePolicyManager
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -54,6 +56,7 @@ class MainActivity : AppCompatActivity() {
 
         setupMasterSwitch()
         loadInstalledApps()
+        promptDeviceAdminActivationIfNeeded()
     }
 
     override fun onResume() {
@@ -61,6 +64,29 @@ class MainActivity : AppCompatActivity() {
         val isAccessibilityEnabled = isAccessibilityServiceEnabled()
         cardPermission.visibility = if (isAccessibilityEnabled) View.GONE else View.VISIBLE
         updateLockedCountText()
+    }
+
+    private fun promptDeviceAdminActivationIfNeeded() {
+        val prefs = getSharedPreferences("security_setup", MODE_PRIVATE)
+        val component = ComponentName(this, AppAdminReceiver::class.java)
+        val dpm = getSystemService(DEVICE_POLICY_SERVICE) as DevicePolicyManager
+        if (dpm.isAdminActive(component) || prefs.getBoolean("admin_prompt_shown", false)) return
+
+        AlertDialog.Builder(this)
+            .setTitle("Enable uninstall protection")
+            .setMessage("Android Device Administrator can require this app's administrator access to be deactivated before uninstalling. It does not enforce your Master PIN inside Android Settings.")
+            .setPositiveButton("Enable") { _, _ ->
+                prefs.edit().putBoolean("admin_prompt_shown", true).apply()
+                val intent = Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN).apply {
+                    putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, component)
+                    putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION, "Enable S Secure device-admin protection. Android may require deactivation before uninstall.")
+                }
+                startActivity(intent)
+            }
+            .setNegativeButton("Not now") { _, _ ->
+                prefs.edit().putBoolean("admin_prompt_shown", true).apply()
+            }
+            .show()
     }
 
     private fun setupMasterSwitch() {

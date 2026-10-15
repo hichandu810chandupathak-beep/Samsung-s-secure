@@ -41,11 +41,13 @@ class LockActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // Fully opaque lock window blocks the protected app/dashboard behind it.
+        // Use an opaque, full-screen window; never show the protected app through the lock.
         window.setBackgroundDrawableResource(R.color.lock_bg_dark)
         window.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
         window.setDimAmount(0f)
         window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
+        window.statusBarColor = ContextCompat.getColor(this, R.color.lock_bg_dark)
+        window.navigationBarColor = ContextCompat.getColor(this, R.color.lock_bg_dark)
         setContentView(R.layout.activity_lock)
         window.setBackgroundDrawableResource(R.color.lock_bg_dark)
         window.decorView.setBackgroundColor(ContextCompat.getColor(this, R.color.lock_bg_dark))
@@ -193,6 +195,7 @@ class LockActivity : AppCompatActivity() {
 
     private fun biometric() {
         if (isFinishing || isDestroyed) return
+        // BIOMETRIC_WEAK allows the enrolled face or fingerprint modality selected by Android.
         val auth = BiometricManager.Authenticators.BIOMETRIC_WEAK
         if (BiometricManager.from(this).canAuthenticate(auth) != BiometricManager.BIOMETRIC_SUCCESS) {
             subtitle.text = "Device biometric unavailable. Use master PIN."; return
