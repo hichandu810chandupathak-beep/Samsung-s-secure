@@ -19,8 +19,22 @@ class PrefManager(context: Context) {
         prefs.edit().putStringSet(KEY_LOCKED_PACKAGES, current).apply()
     }
     fun isAppLocked(packageName: String) = getLockedPackages().contains(packageName)
-    fun getAppLockType(packageName: String) = prefs.getString("lock_type_$packageName", "PIN") ?: "PIN"
-    fun setAppLockType(packageName: String, type: String) { prefs.edit().putString("lock_type_$packageName", type).apply() }
+    // Migrate legacy Pattern/Password/Face selections to PIN. Fingerprint is the only alternative.
+    fun getAppLockType(packageName: String): String {
+        val key = "lock_type_$packageName"
+        val stored = prefs.getString(key, "PIN") ?: "PIN"
+        if (stored == "Fingerprint") return "Fingerprint"
+        if (stored != "PIN") {
+            prefs.edit().putString(key, "PIN")
+                .remove("pattern_$packageName")
+                .remove("password_$packageName")
+                .apply()
+        }
+        return "PIN"
+    }
+    fun setAppLockType(packageName: String, type: String) {
+        prefs.edit().putString("lock_type_$packageName", if (type == "Fingerprint") "Fingerprint" else "PIN").apply()
+    }
     fun getPin() = prefs.getString(KEY_PIN, "1234") ?: "1234"
     fun hasPinSet() = prefs.contains(KEY_PIN)
     fun setPin(pin: String) { prefs.edit().putString(KEY_PIN, pin).apply() }

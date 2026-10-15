@@ -141,26 +141,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showLockOptionsDialog(appItem: AppItem) {
-        val options = arrayOf("PIN Lock", "Pattern Lock", "Fingerprint Lock", "Face Lock", "Password")
+        val options = arrayOf("PIN Lock", "Fingerprint (Biometric)")
         val currentType = prefManager.getAppLockType(appItem.packageName)
-        val checkedItem = when (currentType) {
-            "Pattern" -> 1
-            "Fingerprint" -> 2
-            "Face" -> 3
-            "Password" -> 4
-            else -> 0
-        }
+        val checkedItem = if (currentType == "Fingerprint") 1 else 0
 
         AlertDialog.Builder(this)
             .setTitle("Security for ${appItem.appName}")
             .setSingleChoiceItems(options, checkedItem) { dialog, which ->
-                val selectedType = when (which) {
-                    1 -> "Pattern"
-                    2 -> "Fingerprint"
-                    3 -> "Face"
-                    4 -> "Password"
-                    else -> "PIN"
-                }
+                val selectedType = if (which == 1) "Fingerprint" else "PIN"
                 prefManager.setAppLockType(appItem.packageName, selectedType)
                 prefManager.setAppLocked(appItem.packageName, true)
                 loadInstalledApps()
