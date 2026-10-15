@@ -43,7 +43,11 @@ class LockActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         // Use an opaque, full-screen window; never show the protected app through the lock.
         window.setBackgroundDrawableResource(R.color.lock_bg_dark)
-        window.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
+        window.clearFlags(
+            WindowManager.LayoutParams.FLAG_DIM_BEHIND or
+                WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS or
+                WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION
+        )
         window.setDimAmount(0f)
         window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
         window.statusBarColor = ContextCompat.getColor(this, R.color.lock_bg_dark)

@@ -2,5 +2,4 @@
     <string name="app_name">S Secure</string>
     <string name="service_notification_title">S Secure is active</string>
     <string name="service_notification_text">Protecting your locked apps</string>
-    <string name="device_admin_description">Allow S Secure device administrator protection.</string>
 </resources>
